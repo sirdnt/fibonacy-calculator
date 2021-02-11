@@ -12,6 +12,6 @@ script:
 
 deploy:
   provider: script
-  script: bash docker_hub_push
+  script: bash docker_hub_push.sh
   on:
     branch: master
