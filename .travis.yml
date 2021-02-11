@@ -6,20 +6,25 @@ before_install:
   - docker build -t sirdnt/react-test -f ./client/Dockerfile.dev ./client
 
 script:
+  # login to dockerhub to fix bug limit pull request
+  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
   - docker run sirdnt/react-test npm test -- --coverage
 
 after_success:
+  # login to dockerhub
+  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
+
   # build production docker images
   - docker build -t sirdnt/fc-client ./client/Dockerfile ./client
   - docker build -t sirdnt/fc-api ./server/Dockerfile ./server
   - docker build -t sirdnt/fc-nginx ./nginx/Dockerfile ./nginx
   - docker build -t sirdnt/fc-worker ./worker/Dockerfile ./worker
 
-  # login to dockerhub
-  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
-
   # push image to docker hub
   - docker push sirdnt/fc-client
   - docker push sirdnt/fc-api
   - docker push sirdnt/fc-nginx
   - docker push sirdnt/fc-worker
+
+after_failure:
+  - echo "build failure"
