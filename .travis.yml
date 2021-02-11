@@ -3,11 +3,11 @@ services:
   - docker
 
 before_install:
+  # login to dockerhub to fix bug limit pull request
+  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
   - docker build -t sirdnt/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  # login to dockerhub to fix bug limit pull request
-  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
   - docker run sirdnt/react-test npm test -- --coverage
 
 after_success:
